@@ -1,0 +1,9 @@
+apiVersion: v2
+name: registry-core-ui
+description: OpenG2P Registry Core UI with Extension Locales Support
+type: application
+version: 0.0.0-develop
+appVersion: "0.0.0-develop"
+maintainers:
+  - name: OpenG2P
+    url: https://openg2p.org

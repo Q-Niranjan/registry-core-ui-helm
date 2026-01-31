@@ -1,0 +1,17 @@
+{{- if .Values.extensionLocales.enabled }}
+{{- if .Values.extensionLocales.files }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.extensionLocales.configMapName | default (printf "%s-extension-locales" .Release.Name) }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "registry-core-ui.labels" . | nindent 4 }}
+    registry-type: {{ .Release.Name }}
+    managed-by: cicd
+data:
+  {{- range $filename, $content := .Values.extensionLocales.files }}
+  {{ $filename }}: {{ $content | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}

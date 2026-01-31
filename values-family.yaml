@@ -1,0 +1,33 @@
+# Family Registry specific values
+
+image:
+  repository: qniranjan01/openg2p-registry-core-ui
+  tag: develop
+
+env:
+  APP_MNEMONIC: registry-ui
+  APP_URL: https://registry-family.dev.openg2p.org
+  BACKEND_API_URL: https://staff-family-registry-gen2.dev.openg2p.org
+  MASTERDATA_BACKEND_API_URL: https://gen2-master-data.dev.openg2p.org
+  HOSTNAME: 0.0.0.0
+  PARTNER_IMPORT_EXPORT_ENABLE: "true"
+  PARTNER_INGEST_URL: https://partner-family-registry-gen2.play.openg2p.org/partner/ingest_data?data_model=dcivc
+  VERIFY_SERVICE_URL: https://registry-family.dev.openg2p.org/v1/verify
+  VP_CLIENT_ID: did:web:registry-family.dev.openg2p.org:v1:verify
+  VP_PRESENTATION_ID: 8f3c2a91-bb84-4d1f-9a6e-41c8e5a0d9f3
+  VP_PURPOSE: Digital identity verification for registry onboarding
+  NODE_ENV: production
+  PORT: "3000"
+
+ingress:
+  enabled: true
+  hosts:
+    - host: registry-family.dev.openg2p.org
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Extension locales - will be managed by CI/CD
+extensionLocales:
+  enabled: true
+  configMapName: registry-family-extension-locales

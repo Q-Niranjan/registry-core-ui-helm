@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "registry-core-ui.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "registry-core-ui.labels" . | nindent 4 }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+  selector:
+    matchLabels:
+      {{- include "registry-core-ui.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      annotations:
+        helm.sh/revision: {{ .Release.Revision | quote }}
+        {{- if .Values.extensionLocales.enabled }}
+        # This will force pod restart when ConfigMap changes
+        checksum/extension-locales: {{ include (print $.Template.BasePath "/configmap-extension-locales.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "registry-core-ui.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: registry-core-ui
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        env:
+        {{- range $key, $value := .Values.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 10 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- if .Values.extensionLocales.enabled }}
+        volumeMounts:
+        - name: extension-locales
+          mountPath: /app/extension-locales
+          readOnly: true
+        {{- end }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      {{- if .Values.extensionLocales.enabled }}
+      volumes:
+      - name: extension-locales
+        configMap:
+          name: {{ .Values.extensionLocales.configMapName | default (printf "%s-extension-locales" .Release.Name) }}
+      {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
