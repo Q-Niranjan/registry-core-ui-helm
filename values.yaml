@@ -1,76 +1,15 @@
-# Default values for registry-core-ui
-# This is a YAML-formatted file.
-
 replicaCount: 1
 
 image:
   repository: qniranjan01/openg2p-registry-core-ui
+  tag: develop
   pullPolicy: Always
-  tag: "develop"
 
-nameOverride: ""
-fullnameOverride: ""
+containerPort: 3000
 
-serviceAccount:
-  create: false
-  name: "default"
-
-podAnnotations: {}
-
-podSecurityContext: {}
-
-securityContext: {}
-
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 3000
-
-ingress:
-  enabled: true
-  className: ""
-  annotations: {}
-  hosts:
-    - host: registry.example.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-
-resources: {}
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: 3000
-    scheme: HTTP
-  initialDelaySeconds: 15
-  periodSeconds: 60
-  failureThreshold: 5
-  successThreshold: 1
-  timeoutSeconds: 1
-
-readinessProbe:
-  httpGet:
-    path: /
-    port: 3000
-    scheme: HTTP
-  initialDelaySeconds: 30
-  periodSeconds: 30
-  failureThreshold: 20
-  successThreshold: 1
-  timeoutSeconds: 10
-
-# Environment variables
 env:
-  APP_MNEMONIC: "registry-ui"
-  NODE_ENV: "production"
-  PORT: "3000"
+  NODE_ENV: production
   HOSTNAME: "0.0.0.0"
 
-# Extension locales configuration
-extensionLocales:
-  enabled: false
+locales:
   configMapName: ""
-  # When enabled by CI/CD, files will be populated here
-  files: {}
